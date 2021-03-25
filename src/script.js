@@ -23,7 +23,7 @@ const material = new THREE.MeshMatcapMaterial({ matcap: matcapTexture });
 const fontLoader = new THREE.FontLoader();
 
 fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
-  const textGeometry = new THREE.TextGeometry("Kats three.js test", {
+  const textGeometry = new THREE.TextGeometry("Kat's three.js test", {
     font,
     size: 0.5,
     height: 0.2,
