@@ -1,78 +1,72 @@
 import "./style.css";
 import * as THREE from "three";
-import * as dat from "dat.gui";
+// import * as dat from "dat.gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 /**
  * Debug
  */
-const gui = new dat.GUI();
+// const gui = new dat.GUI();
+
+const canvas = document.querySelector("canvas.webgl");
+const scene = new THREE.Scene();
 
 /**
  * Textures
  */
-const cubeTextureLoader = new THREE.CubeTextureLoader();
-
-const environmentMapTexture = cubeTextureLoader.load([
-  "/textures/environmentMaps/1/px.jpg",
-  "/textures/environmentMaps/1/nx.jpg",
-  "/textures/environmentMaps/1/py.jpg",
-  "/textures/environmentMaps/1/ny.jpg",
-  "/textures/environmentMaps/1/pz.jpg",
-  "/textures/environmentMaps/1/nz.jpg",
-]);
-
+const textureLoader = new THREE.TextureLoader();
+const matcapTexture = textureLoader.load("/textures/matcaps/8.png");
+const material = new THREE.MeshMatcapMaterial({ matcap: matcapTexture });
 /**
- * Base
+ * Fonts
  */
-// Canvas
-const canvas = document.querySelector("canvas.webgl");
+const fontLoader = new THREE.FontLoader();
 
-// Scene
-const scene = new THREE.Scene();
+fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
+  const textGeometry = new THREE.TextGeometry("Kats three.js test", {
+    font,
+    size: 0.5,
+    height: 0.2,
+    curveSegments: 12,
+    bevelEnabled: true,
+    bevelThickness: 0.03,
+    bevelSize: 0.02,
+    bevelOffset: 0,
+    bevelSegments: 5,
+  });
+
+  textGeometry.center();
+
+  const text = new THREE.Mesh(textGeometry, material);
+  text.rotation.y = 0.5;
+  text.rotation.x = -0.2;
+
+  scene.add(text);
+});
 
 /**
  * Objects
  */
-const material = new THREE.MeshStandardMaterial();
-material.metalness = 1;
-material.roughness = 0;
+const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
 
-material.envMap = environmentMapTexture;
+for (let i = 0; i < 150; i++) {
+  const donut = new THREE.Mesh(donutGeometry, material);
+  donut.position.x = (Math.random() - 0.5) * 10;
+  donut.position.y = (Math.random() - 0.5) * 10;
+  donut.position.z = (Math.random() - 0.5) * 10;
 
-gui.add(material, "metalness").min(0).max(1);
-gui.add(material, "roughness").min(0).max(1);
+  donut.rotation.x = Math.random() * Math.PI;
+  donut.rotation.y = Math.random() * Math.PI;
 
-const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), material);
-sphere.geometry.setAttribute(
-  "uv2",
-  new THREE.BufferAttribute(sphere.geometry.attributes.uv.array, 2)
-);
+  const scale = Math.random();
+  donut.scale.set(scale, scale, scale);
 
-const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 1, 1), material);
-plane.geometry.setAttribute(
-  "uv2",
-  new THREE.BufferAttribute(plane.geometry.attributes.uv.array, 2)
-);
-
-const torus = new THREE.Mesh(
-  new THREE.TorusGeometry(0.3, 0.2, 64, 128),
-  material
-);
-torus.geometry.setAttribute(
-  "uv2",
-  new THREE.BufferAttribute(torus.geometry.attributes.uv.array, 2)
-);
-
-sphere.position.x = -1.5;
-torus.position.x = 1.5;
-
-scene.add(sphere, plane, torus);
+  scene.add(donut);
+}
 
 /**
  * Light
  */
-
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
@@ -130,25 +124,14 @@ controls.enableDamping = true;
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
+
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 /**
  * Animate
  */
-const clock = new THREE.Clock();
-
 const tick = () => {
-  const elapsedTime = clock.getElapsedTime();
-  // update objects
-  sphere.rotation.y = 0.1 * elapsedTime;
-  plane.rotation.y = 0.1 * elapsedTime;
-  torus.rotation.y = 0.1 * elapsedTime;
-
-  sphere.rotation.x = 0.15 * elapsedTime;
-  plane.rotation.x = 0.15 * elapsedTime;
-  torus.rotation.x = 0.15 * elapsedTime;
-
   // Update controls
   controls.update();
 
