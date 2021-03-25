@@ -15,14 +15,14 @@ const scene = new THREE.Scene();
  * Textures
  */
 const textureLoader = new THREE.TextureLoader();
-const matcapTexture = textureLoader.load("/textures/matcaps/8.png");
+const matcapTexture = textureLoader.load("./textures/matcaps/8.png");
 const material = new THREE.MeshMatcapMaterial({ matcap: matcapTexture });
 /**
  * Fonts
  */
 const fontLoader = new THREE.FontLoader();
 
-fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
+fontLoader.load("./fonts/helvetiker_regular.typeface.json", (font) => {
   const textGeometry = new THREE.TextGeometry("Kat's three.js test", {
     font,
     size: 0.5,
